@@ -71,120 +71,248 @@ st.set_page_config(
 # ================================
 
 st.markdown("""
-
 <style>
 
+/* Import Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+html, body, [class*="css"]{
+    font-family:'Poppins',sans-serif;
+}
+
+/* Background */
+
+.stApp{
+    background:
+    linear-gradient(
+    135deg,
+    #0F172A 0%,
+    #111827 40%,
+    #1E293B 100%);
+}
+
+/* Header */
+
 header{
-visibility:hidden;
+    visibility:hidden;
 }
 
 footer{
-visibility:hidden;
+    visibility:hidden;
 }
 
 .block-container{
-padding-top:2rem;
+    padding-top:2rem;
+    padding-left:3rem;
+    padding-right:3rem;
 }
 
-.stApp{
-
-background:
-linear-gradient(
-135deg,
-#0F172A,
-#111827,
-#1E293B
-);
-
-}
+/* Sidebar */
 
 section[data-testid="stSidebar"]{
-
-background:#111827;
-
+    background:#111827;
+    border-right:1px solid rgba(255,255,255,.08);
 }
 
 section[data-testid="stSidebar"] *{
+    color:white;
+}
+
+/* Hero */
+
+.hero{
+
+background:linear-gradient(
+135deg,
+#4F46E5,
+#2563EB,
+#06B6D4);
+
+padding:35px;
+
+border-radius:25px;
+
+text-align:center;
 
 color:white;
 
+box-shadow:
+0 15px 40px rgba(0,0,0,.35);
+
+margin-bottom:25px;
+
+transition:.3s;
 }
 
-.dashboard{
+.hero:hover{
+
+transform:translateY(-5px);
+
+}
+
+/* Cards */
+
+.card{
+
+background:rgba(255,255,255,.07);
+
+backdrop-filter:blur(16px);
+
+border:1px solid rgba(255,255,255,.12);
+
+padding:25px;
+
+border-radius:22px;
+
+box-shadow:0 12px 35px rgba(0,0,0,.25);
+
+margin-bottom:25px;
+
+transition:.35s;
+
+}
+
+.card:hover{
+
+transform:translateY(-8px);
+
+box-shadow:0 25px 45px rgba(0,0,0,.45);
+
+}
+
+/* Metric */
+
+[data-testid="metric-container"]{
+
+background:linear-gradient(
+135deg,
+#1E293B,
+#334155);
 
 padding:25px;
 
 border-radius:20px;
 
-background:
-linear-gradient(
-135deg,
-#4F46E5,
-#6366F1
-);
+border:1px solid rgba(255,255,255,.08);
 
-color:white;
+box-shadow:0 10px 30px rgba(0,0,0,.25);
 
-text-align:center;
-
-box-shadow:
-0 10px 25px rgba(0,0,0,.35);
-
-margin-bottom:20px;
+transition:.3s;
 
 }
 
-.card{
+[data-testid="metric-container"]:hover{
 
-background:rgba(255,255,255,.08);
-
-padding:20px;
-
-border-radius:18px;
-
-backdrop-filter:blur(12px);
-
-margin-bottom:20px;
-
-border:1px solid rgba(255,255,255,.15);
+transform:scale(1.05);
 
 }
+
+/* Buttons */
 
 .stButton>button{
 
 width:100%;
 
-border-radius:12px;
+padding:12px;
 
-background:#2563EB;
+border-radius:15px;
+
+border:none;
+
+font-weight:600;
+
+background:linear-gradient(
+135deg,
+#2563EB,
+#4F46E5);
 
 color:white;
 
-font-weight:bold;
+transition:.3s;
 
 }
 
 .stButton>button:hover{
 
-background:#1D4ED8;
+transform:translateY(-3px);
+
+box-shadow:0 12px 25px rgba(37,99,235,.45);
 
 }
 
-[data-testid="metric-container"]{
+/* File uploader */
+
+[data-testid="stFileUploader"]{
 
 background:#1E293B;
 
-border-radius:15px;
+padding:20px;
 
-padding:15px;
+border-radius:18px;
 
-color:white;
+border:2px dashed #4F46E5;
+
+}
+
+/* Chat */
+
+.stChatMessage{
+
+border-radius:18px;
+
+padding:18px;
+
+background:#1E293B;
+
+}
+
+/* Progress */
+
+.stProgress > div > div > div{
+
+background:
+linear-gradient(
+90deg,
+#2563EB,
+#06B6D4);
+
+}
+
+/* Success */
+
+.stSuccess{
+
+border-radius:18px;
+
+}
+
+/* Warning */
+
+.stWarning{
+
+border-radius:18px;
+
+}
+
+/* Info */
+
+.stInfo{
+
+border-radius:18px;
+
+}
+
+/* Error */
+
+.stError{
+
+border-radius:18px;
 
 }
 
 </style>
 
-""", unsafe_allow_html=True)
+""",unsafe_allow_html=True)
 
 # ================================
 # Hero Section
@@ -192,19 +320,19 @@ color:white;
 
 st.markdown("""
 
-<div class="dashboard">
+<div class="hero">
 
 <h1>📚 AI Study Assistant Pro</h1>
 
-<h4>Learn Faster • Study Smarter • Powered by Gemini AI</h4>
+<h3>Learn Faster • Study Smarter</h3>
 
 <p>
-Chat with PDFs • Generate Notes • Flashcards • Quiz • AI Summary
+💬 Chat with PDFs • 📝 AI Notes • 📚 MCQs • 🎯 Quiz • 🧠 Mind Map
 </p>
 
 </div>
 
-""", unsafe_allow_html=True)
+""",unsafe_allow_html=True)
 
 # ================================
 # Welcome Card
@@ -214,19 +342,31 @@ st.markdown("""
 
 <div class="card">
 
-<h3 style="color:white;">
-👋 Welcome
-</h3>
+<h2>👋 Welcome</h2>
 
-<p style="color:white;">
+<p>
 
-Upload your study PDFs and let AI help you prepare for exams.
+Upload one or more study PDFs and unlock powerful AI tools.
 
 </p>
 
+<ul>
+
+<li>💬 Chat with PDF</li>
+
+<li>📝 Generate Notes</li>
+
+<li>📚 Important Questions</li>
+
+<li>🧠 Mind Maps</li>
+
+<li>🎯 Quiz Mode</li>
+
+</ul>
+
 </div>
 
-""", unsafe_allow_html=True)
+""",unsafe_allow_html=True)
 # =====================================
 # Sidebar
 # =====================================
@@ -319,20 +459,34 @@ reading_time = max(1, words // 200)
 
 st.success("✅ PDF Uploaded Successfully")
 
-c1, c2, c3, c4 = st.columns(4)
+st.markdown("## 📊 Dashboard")
 
-with c1:
-    st.metric("📄 Pages", pages)
+col1, col2, col3, col4 = st.columns(4)
 
-with c2:
-    st.metric("📝 Words", words)
+cards = [
+    ("📄", "Pages", pages, "#2563EB"),
+    ("📝", "Words", f"{words:,}", "#7C3AED"),
+    ("🔤", "Characters", f"{characters:,}", "#10B981"),
+    ("⏱", "Reading", f"{reading_time} min", "#F59E0B")
+]
 
-with c3:
-    st.metric("🔤 Characters", characters)
-
-with c4:
-    st.metric("⏱ Reading", f"{reading_time} min")
-
+for col, (icon, title, value, color) in zip([col1, col2, col3, col4], cards):
+    with col:
+        st.markdown(f"""
+        <div style="
+        background:linear-gradient(135deg,{color},#111827);
+        padding:25px;
+        border-radius:22px;
+        color:white;
+        text-align:center;
+        box-shadow:0 10px 30px rgba(0,0,0,.35);
+        transition:.3s;
+        ">
+            <div style="font-size:42px;">{icon}</div>
+            <h4>{title}</h4>
+            <h2>{value}</h2>
+        </div>
+        """, unsafe_allow_html=True)
 # =====================================
 # Search in PDF
 # =====================================
