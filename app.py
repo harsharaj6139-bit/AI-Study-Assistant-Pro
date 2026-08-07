@@ -1,15 +1,47 @@
+# ==========================================
+# AI Study Assistant Pro V4.0
+# Created by Harsha
+# ==========================================
+
 import os
-from dotenv import load_dotenv
+from datetime import datetime
+
 import streamlit as st
+from dotenv import load_dotenv
 from pypdf import PdfReader
 from google import genai
-from reportlab.platypus import SimpleDocTemplate, Paragraph
-from reportlab.lib.styles import getSampleStyleSheet
-import plotly.express as px
 
-# ================================
-# Load Gemini API
-# ================================
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph
+)
+
+from reportlab.lib.styles import (
+    getSampleStyleSheet
+)
+
+import plotly.express as px
+import pandas as pd
+
+# ==========================================
+# PAGE CONFIG
+# ==========================================
+
+st.set_page_config(
+
+    page_title="AI Study Assistant Pro",
+
+    page_icon="📚",
+
+    layout="wide",
+
+    initial_sidebar_state="expanded"
+
+)
+
+# ==========================================
+# LOAD ENVIRONMENT
+# ==========================================
 
 load_dotenv()
 
@@ -17,153 +49,189 @@ client = genai.Client(
     api_key=os.getenv("GOOGLE_API_KEY")
 )
 
-# ================================
-# PDF Creator
-# ================================
+# ==========================================
+# SESSION STATE
+# ==========================================
+
+defaults = {
+
+    "messages": [],
+
+    "bookmarks": [],
+
+    "theme": "dark"
+
+}
+
+for key, value in defaults.items():
+
+    if key not in st.session_state:
+
+        st.session_state[key] = value
+
+# ==========================================
+# PDF EXPORT
+# ==========================================
 
 def create_pdf(text, filename):
 
     doc = SimpleDocTemplate(filename)
+
     styles = getSampleStyleSheet()
 
     story = []
 
     for line in text.split("\n"):
+
         story.append(
+
             Paragraph(line, styles["BodyText"])
+
         )
 
     doc.build(story)
 
-
-# ================================
-# Gemini Function
-# ================================
+# ==========================================
+# GEMINI
+# ==========================================
 
 def ask_ai(prompt):
 
     try:
 
         response = client.models.generate_content(
+
             model="gemini-3.6-flash",
+
             contents=prompt
+
         )
 
         return response.text
 
     except Exception as e:
 
-        return f"❌ {e}"
+        return str(e)
+    st.markdown("""
 
-
-# ================================
-# Streamlit Page
-# ================================
-
-st.set_page_config(
-    page_title="AI Study Assistant Pro",
-    page_icon="📚",
-    layout="wide"
-)
-
-# ================================
-# CSS
-# ================================
-
-st.markdown("""
 <style>
 
-/* Import Font */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-html, body, [class*="css"]{
-    font-family:'Poppins',sans-serif;
+html,body,[class*="css"]{
+
+font-family:'Poppins',sans-serif;
+
 }
 
 /* Background */
 
 .stApp{
-    background:
-    linear-gradient(
-    135deg,
-    #0F172A 0%,
-    #111827 40%,
-    #1E293B 100%);
+
+background:
+
+linear-gradient(
+
+135deg,
+
+#0B1120,
+
+#111827,
+
+#1E293B);
+
 }
 
-/* Header */
+/* Hide */
 
 header{
-    visibility:hidden;
+
+visibility:hidden;
+
 }
 
 footer{
-    visibility:hidden;
+
+visibility:hidden;
+
 }
 
+#MainMenu{
+
+visibility:hidden;
+
+}
+
+/* Layout */
+
 .block-container{
-    padding-top:2rem;
-    padding-left:3rem;
-    padding-right:3rem;
+
+padding-top:30px;
+
+padding-left:35px;
+
+padding-right:35px;
+
 }
 
 /* Sidebar */
 
 section[data-testid="stSidebar"]{
-    background:#111827;
-    border-right:1px solid rgba(255,255,255,.08);
+
+background:
+
+linear-gradient(
+
+180deg,
+
+#0F172A,
+
+#111827);
+
+width:320px !important;
+
+border-right:1px solid rgba(255,255,255,.08);
+
 }
 
 section[data-testid="stSidebar"] *{
-    color:white;
-}
-}
-
-/* Hero */
-/* Sidebar Menu */
-
-div[role="radiogroup"] > label{
-    background:#1E293B;
-    padding:14px 16px;
-    border-radius:14px;
-    margin-bottom:10px;
-    border:1px solid rgba(255,255,255,.06);
-    transition:0.3s;
-}
-
-div[role="radiogroup"] > label:hover{
-    background:#4F46E5;
-    transform:translateX(8px);
-    box-shadow:0 8px 20px rgba(79,70,229,.35);
-}
-
-div[role="radiogroup"] p{
-    color:white;
-    font-size:16px;
-    font-weight:600;
-}
-.hero{
-
-background:linear-gradient(
-135deg,
-#4F46E5,
-#2563EB,
-#06B6D4);
-
-padding:35px;
-
-border-radius:25px;
-
-text-align:center;
 
 color:white;
 
+}
+
+/* Hero */
+
+.hero{
+
+background:
+
+linear-gradient(
+
+135deg,
+
+#4F46E5,
+
+#2563EB,
+
+#06B6D4);
+
+padding:45px;
+
+border-radius:30px;
+
+color:white;
+
+text-align:center;
+
 box-shadow:
+
 0 15px 40px rgba(0,0,0,.35);
 
 margin-bottom:25px;
 
 transition:.3s;
+
 }
 
 .hero:hover{
@@ -176,56 +244,27 @@ transform:translateY(-5px);
 
 .card{
 
-background:rgba(255,255,255,.07);
+background:
 
-backdrop-filter:blur(16px);
+rgba(255,255,255,.07);
 
-border:1px solid rgba(255,255,255,.12);
+backdrop-filter:blur(18px);
 
 padding:25px;
 
 border-radius:22px;
 
-box-shadow:0 12px 35px rgba(0,0,0,.25);
-
-margin-bottom:25px;
-
-transition:.35s;
-
-}
-
-.card:hover{
-
-transform:translateY(-8px);
-
-box-shadow:0 25px 45px rgba(0,0,0,.45);
-
-}
-
-/* Metric */
-
-[data-testid="metric-container"]{
-
-background:linear-gradient(
-135deg,
-#1E293B,
-#334155);
-
-padding:25px;
-
-border-radius:20px;
-
 border:1px solid rgba(255,255,255,.08);
 
-box-shadow:0 10px 30px rgba(0,0,0,.25);
+margin-bottom:25px;
 
 transition:.3s;
 
 }
 
-[data-testid="metric-container"]:hover{
+.card:hover{
 
-transform:scale(1.05);
+transform:translateY(-6px);
 
 }
 
@@ -235,34 +274,39 @@ transform:scale(1.05);
 
 width:100%;
 
-padding:12px;
-
-border-radius:15px;
-
 border:none;
 
-font-weight:600;
+border-radius:14px;
 
-background:linear-gradient(
+padding:12px;
+
+background:
+
+linear-gradient(
+
 135deg,
+
 #2563EB,
+
 #4F46E5);
 
 color:white;
 
-transition:.3s;
+font-size:16px;
+
+font-weight:600;
 
 }
 
 .stButton>button:hover{
 
-transform:translateY(-3px);
+box-shadow:
 
-box-shadow:0 12px 25px rgba(37,99,235,.45);
+0 10px 25px rgba(37,99,235,.45);
 
 }
 
-/* File uploader */
+/* Upload */
 
 [data-testid="stFileUploader"]{
 
@@ -276,69 +320,34 @@ border:2px dashed #4F46E5;
 
 }
 
-/* Chat */
+/* Metrics */
 
-.stChatMessage{
+[data-testid="metric-container"]{
 
-border-radius:18px;
+background:
+
+linear-gradient(
+
+135deg,
+
+#1E293B,
+
+#334155);
 
 padding:18px;
 
-background:#1E293B;
-
-}
-
-/* Progress */
-
-.stProgress > div > div > div{
-
-background:
-linear-gradient(
-90deg,
-#2563EB,
-#06B6D4);
-
-}
-
-/* Success */
-
-.stSuccess{
-
 border-radius:18px;
 
-}
-
-/* Warning */
-
-.stWarning{
-
-border-radius:18px;
-
-}
-
-/* Info */
-
-.stInfo{
-
-border-radius:18px;
-
-}
-
-/* Error */
-
-.stError{
-
-border-radius:18px;
+border:1px solid rgba(255,255,255,.08);
 
 }
 
 </style>
 
-""",unsafe_allow_html=True)
-
-# ================================
-# Hero Section
-# ================================
+""", unsafe_allow_html=True)
+    # ==========================================
+# HERO
+# ==========================================
 
 st.markdown("""
 
@@ -346,111 +355,135 @@ st.markdown("""
 
 <h1>📚 AI Study Assistant Pro</h1>
 
-<h3>Learn Faster • Study Smarter</h3>
+<h3>Learn Faster • Study Smarter • Powered by Gemini AI</h3>
 
 <p>
-💬 Chat with PDFs • 📝 AI Notes • 📚 MCQs • 🎯 Quiz • 🧠 Mind Map
+
+💬 Chat with PDF &nbsp;&nbsp;&nbsp;
+📝 AI Notes &nbsp;&nbsp;&nbsp;
+📚 MCQs &nbsp;&nbsp;&nbsp;
+🎯 Quiz &nbsp;&nbsp;&nbsp;
+🧠 Mind Map
+
 </p>
 
 </div>
 
-""",unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
-# ================================
-# Welcome Card
-# ================================
+# ==========================================
+# SIDEBAR
+# ==========================================
 
-st.markdown("""
+st.sidebar.markdown("# 🤖 AI Study Assistant")
 
-<div class="card">
-
-<h2>👋 Welcome</h2>
-
-<p>
-
-Upload one or more study PDFs and unlock powerful AI tools.
-
-</p>
-
-<ul>
-
-</ul>
-
-</div>
-
-""",unsafe_allow_html=True)
-# =====================================
-# Sidebar
-# =====================================
-
-st.sidebar.title("🤖 AI Study Assistant")
-
-feature = st.sidebar.radio(
-    "Choose a Feature",
-    [
-        "💬 Chat with PDF",
-        "📝 Summarize PDF",
-        "📝 AI Notes",
-        "📚 Important Questions",
-        "❓ Generate MCQs",
-        "🃏 Flashcards",
-        "🎯 Quiz Mode",
-        "🔑 Keywords",
-        "🧠 Explain Topic",
-        "🌐 Translate Notes",
-        "💼 Interview Questions",
-        "📅 Study Planner",
-        "🧠 Mind Map",
-        "📈 Progress Tracker",
-        "⭐ Bookmarks",
-        "📋 Cheat Sheet",
-        "🧮 Formula Extractor",
-        "🗑 Clear Chat"
-    ]
+st.sidebar.markdown(
+"#### Your Personal AI Learning Companion"
 )
 
 st.sidebar.markdown("---")
-st.sidebar.success("Version 3.0")
 
-# =====================================
-# Upload PDF
-# =====================================
+feature = st.sidebar.selectbox(
 
-uploaded_files = st.file_uploader(
-    "📂 Upload PDF(s)",
-    type=["pdf"],
-    accept_multiple_files=True
+    "📂 Choose Feature",
+
+    [
+
+        "💬 Chat with PDF",
+
+        "📝 AI Summary",
+
+        "📖 AI Notes",
+
+        "📚 Important Questions",
+
+        "❓ MCQs",
+
+        "🃏 Flashcards",
+
+        "🎯 Quiz",
+
+        "🔑 Keywords",
+
+        "🧠 Explain Topic",
+
+        "🌍 Translate",
+
+        "💼 Interview",
+
+        "📅 Study Planner",
+
+        "🧠 Mind Map",
+
+        "📈 Progress",
+
+        "⭐ Bookmarks",
+
+        "📋 Cheat Sheet",
+
+        "🧮 Formula Extractor"
+
+    ]
+
 )
 
-# =====================================
-# Session State
-# =====================================
+st.sidebar.markdown("---")
 
-if "messages" not in st.session_state:
-    st.session_state.messages = []
+st.sidebar.info("🚀 Version 4.0")
 
-if feature == "🗑 Clear Chat":
-    st.session_state.messages = []
-    st.sidebar.success("Chat Cleared")
+# ==========================================
+# UPLOAD SECTION
+# ==========================================
 
-# =====================================
-# Wait for PDF
-# =====================================
+st.markdown("""
+<div class="card">
+
+<h2>📂 Upload Study Material</h2>
+
+<p>
+
+Upload one or multiple PDF files.
+
+Supported Format:
+
+✅ PDF
+
+Maximum:
+
+200 MB
+
+</p>
+
+</div>
+
+""", unsafe_allow_html=True)
+
+uploaded_files = st.file_uploader(
+
+"",
+
+type=["pdf"],
+
+accept_multiple_files=True
+
+)
 
 if not uploaded_files:
-    st.info("📄 Upload one or more PDF files to continue.")
-    st.stop()
 
-# =====================================
-# Read PDF
-# =====================================
+    st.warning("👆 Upload your study PDFs to continue.")
+
+    st.stop()
+# ==========================================
+# READ PDF
+# ==========================================
 
 pdf_text = ""
+
 pages = 0
 
-for uploaded_file in uploaded_files:
+for pdf in uploaded_files:
 
-    reader = PdfReader(uploaded_file)
+    reader = PdfReader(pdf)
 
     pages += len(reader.pages)
 
@@ -459,104 +492,437 @@ for uploaded_file in uploaded_files:
         text = page.extract_text()
 
         if text:
+
             pdf_text += text + "\n"
 
 words = len(pdf_text.split())
+
 characters = len(pdf_text)
-reading_time = max(1, words // 200)
 
-# =====================================
-# Dashboard
-# =====================================
+reading = max(1, words // 200)
 
-st.success("✅ PDF Uploaded Successfully")
+# ==========================================
+# DASHBOARD
+# ==========================================
 
 st.markdown("## 📊 Dashboard")
 
 col1, col2, col3, col4 = st.columns(4)
 
-cards = [
-    ("📄", "Pages", pages, "#2563EB"),
-    ("📝", "Words", f"{words:,}", "#7C3AED"),
-    ("🔤", "Characters", f"{characters:,}", "#10B981"),
-    ("⏱", "Reading", f"{reading_time} min", "#F59E0B")
-]
+with col1:
 
-for col, (icon, title, value, color) in zip([col1, col2, col3, col4], cards):
-    with col:
-        st.markdown(f"""
-        <div style="
-        background:linear-gradient(135deg,{color},#111827);
-        padding:25px;
-        border-radius:22px;
-        color:white;
-        text-align:center;
-        box-shadow:0 10px 30px rgba(0,0,0,.35);
-        transition:.3s;
-        ">
-            <div style="font-size:42px;">{icon}</div>
-            <h4>{title}</h4>
-            <h2>{value}</h2>
-        </div>
-        """, unsafe_allow_html=True)
-# =====================================
-# Search in PDF
-# =====================================
+    st.metric(
 
-st.markdown("## 🔍 Search in PDF")
+        "📄 Pages",
 
-search = st.text_input("Enter a keyword")
+        pages
+
+    )
+
+with col2:
+
+    st.metric(
+
+        "📝 Words",
+
+        f"{words:,}"
+
+    )
+
+with col3:
+
+    st.metric(
+
+        "🔤 Characters",
+
+        f"{characters:,}"
+
+    )
+
+with col4:
+
+    st.metric(
+
+        "⏱ Reading",
+
+        f"{reading} min"
+
+    )
+
+st.markdown("---")
+
+search = st.text_input(
+
+"🔍 Search inside PDF"
+
+)
 
 if search:
 
     if search.lower() in pdf_text.lower():
 
-        st.success(f'✅ "{search}" found.')
+        st.success("✅ Keyword Found")
 
     else:
 
-        st.error(f'❌ "{search}" not found.')
+        st.error("❌ Not Found")
+# ==========================================
+# READ PDF
+# ==========================================
+
+pdf_text = ""
+
+pages = 0
+
+for pdf in uploaded_files:
+
+    reader = PdfReader(pdf)
+
+    pages += len(reader.pages)
+
+    for page in reader.pages:
+
+        text = page.extract_text()
+
+        if text:
+
+            pdf_text += text + "\n"
+
+words = len(pdf_text.split())
+
+characters = len(pdf_text)
+
+reading = max(1, words // 200)
+
+# ==========================================
+# DASHBOARD
+# ==========================================
+
+st.markdown("## 📊 Dashboard")
+
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+
+    st.metric(
+
+        "📄 Pages",
+
+        pages
+
+    )
+
+with col2:
+
+    st.metric(
+
+        "📝 Words",
+
+        f"{words:,}"
+
+    )
+
+with col3:
+
+    st.metric(
+
+        "🔤 Characters",
+
+        f"{characters:,}"
+
+    )
+
+with col4:
+
+    st.metric(
+
+        "⏱ Reading",
+
+        f"{reading} min"
+
+    )
 
 st.markdown("---")
-# =====================================
+
+search = st.text_input(
+
+"🔍 Search inside PDF"
+
+)
+
+if search:
+
+    if search.lower() in pdf_text.lower():
+
+        st.success("✅ Keyword Found")
+
+    else:
+
+        st.error("❌ Not Found")
+# ==========================================
+# PREMIUM DASHBOARD
+# ==========================================
+
+st.markdown("## 📊 AI Dashboard")
+
+col1, col2, col3, col4 = st.columns(4)
+
+cards = [
+
+("📄","Pages",pages,"#2563EB"),
+
+("📝","Words",f"{words:,}","#8B5CF6"),
+
+("🔤","Characters",f"{characters:,}","#10B981"),
+
+("⏱","Reading",f"{reading} min","#F59E0B")
+
+]
+
+for col,(icon,title,value,color) in zip(
+[col1,col2,col3,col4],cards):
+
+    with col:
+
+        st.markdown(f"""
+
+<div style="
+
+background:linear-gradient(135deg,{color},#111827);
+
+padding:28px;
+
+border-radius:22px;
+
+text-align:center;
+
+color:white;
+
+box-shadow:0 12px 25px rgba(0,0,0,.35);
+
+">
+
+<div style="font-size:42px">
+
+{icon}
+
+</div>
+
+<h4>{title}</h4>
+
+<h2>{value}</h2>
+
+</div>
+
+""",unsafe_allow_html=True)
+        st.markdown("<br>",unsafe_allow_html=True)
+
+a,b,c=st.columns(3)
+
+with a:
+
+    st.success("🤖 Gemini AI Connected")
+
+with b:
+
+    st.info(f"📚 {len(uploaded_files)} PDF Uploaded")
+
+with c:
+
+    st.warning("⚡ AI Ready")
+st.markdown("## 📈 PDF Analytics")
+
+df=pd.DataFrame({
+
+"Metric":[
+
+"Pages",
+
+"Words",
+
+"Reading"
+
+],
+
+"Value":[
+
+pages,
+
+words,
+
+reading
+
+]
+
+})
+
+fig=px.bar(
+
+df,
+
+x="Metric",
+
+y="Value",
+
+text="Value",
+
+height=350
+
+)
+
+fig.update_layout(
+
+paper_bgcolor="#111827",
+
+plot_bgcolor="#111827",
+
+font_color="white"
+
+)
+
+st.plotly_chart(
+
+fig,
+
+use_container_width=True
+)
+st.markdown("""
+
+<div class="card">
+
+<h2>📌 Recent Activity</h2>
+
+<ul>
+
+<li>✅ PDF Uploaded</li>
+
+<li>🤖 Gemini Connected</li>
+
+<li>📚 AI Ready</li>
+
+<li>💬 Chat Available</li>
+
+<li>🎯 18 AI Features Enabled</li>
+
+</ul>
+
+</div>
+
+""",unsafe_allow_html=True)
+st.markdown("""
+
+<div class="card">
+
+<h3>🔍 Smart Search</h3>
+
+<p>
+
+Search anything inside your uploaded PDF.
+
+</p>
+
+</div>
+
+""",unsafe_allow_html=True)
+
+search=st.text_input("",placeholder="Search any keyword...")
+
+if search:
+
+    if search.lower() in pdf_text.lower():
+
+        st.success("✅ Keyword Found")
+
+    else:
+
+        st.error("❌ Keyword Not Found")
+    /* =======================================
+CHAT UI
+======================================= */
+
+.stChatMessage{
+
+background:#1E293B;
+
+border-radius:18px;
+
+padding:18px;
+
+margin-bottom:12px;
+
+border:1px solid rgba(255,255,255,.08);
+
+box-shadow:0 8px 20px rgba(0,0,0,.2);
+
+}
+
+.chat-title{
+
+font-size:32px;
+
+font-weight:700;
+
+color:white;
+
+margin-bottom:10px;
+
+}
+
+.chat-subtitle{
+
+color:#94A3B8;
+
+font-size:15px;
+
+margin-bottom:25px;
+
+}
+# ==========================================
 # CHAT WITH PDF
-# =====================================
+# ==========================================
 
 if feature == "💬 Chat with PDF":
 
-    st.header("💬 Chat with Your PDF")
+    st.markdown("""
+    <div class="chat-title">
+        💬 AI Chat Assistant
+    </div>
 
-    # Display previous messages
+    <div class="chat-subtitle">
+        Ask anything from your uploaded PDF.
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Display chat history
     for message in st.session_state.messages:
 
-        with st.chat_message(message["role"]):
+        avatar = "🧑‍🎓" if message["role"] == "user" else "🤖"
+
+        with st.chat_message(message["role"], avatar=avatar):
             st.markdown(message["content"])
 
-    question = st.chat_input("Ask anything from your PDF...")
+    question = st.chat_input(
+        "Ask a question about your PDF..."
+    )
 
     if question:
 
-        # Show user message
-        st.session_state.messages.append(
-            {
-                "role": "user",
-                "content": question
-            }
-        )
+        st.session_state.messages.append({
+            "role":"user",
+            "content":question
+        })
 
-        with st.chat_message("user"):
+        with st.chat_message("user", avatar="🧑‍🎓"):
             st.markdown(question)
 
-        # AI Prompt
         prompt = f"""
 You are an AI Study Assistant.
 
-Answer ONLY using the uploaded PDF.
+Answer ONLY from the uploaded PDF.
 
-If the answer is not available in the PDF,
-reply exactly:
+If the answer does not exist in the PDF, reply:
 
-"I couldn't find this information in the uploaded PDF."
+'I couldn't find this information in the uploaded PDF.'
 
 PDF:
 
@@ -567,670 +933,55 @@ Question:
 {question}
 """
 
-        with st.spinner("🤖 Thinking..."):
+        with st.spinner("🧠 Gemini AI is analyzing your PDF..."):
 
             answer = ask_ai(prompt)
 
-        st.session_state.messages.append(
-            {
-                "role": "assistant",
-                "content": answer
-            }
-        )
+        st.session_state.messages.append({
+            "role":"assistant",
+            "content":answer
+        })
 
-        with st.chat_message("assistant"):
+        with st.chat_message("assistant", avatar="🤖"):
+
             st.markdown(answer)
+st.markdown(answer)
 
-# =====================================
-# END CHAT
-# =====================================
-# =====================================
-# AI SUMMARY
-# =====================================
+st.code(answer, language="text")
+col1,col2,col3 = st.columns(3)
 
-elif feature == "📝 Summarize PDF":
+with col1:
+    st.info(f"💬 Messages: {len(st.session_state.messages)}")
 
-    st.header("📝 AI Summary")
+with col2:
+    st.success("🤖 Gemini Online")
 
-    if st.button("Generate Summary"):
+with col3:
+    st.warning(f"📄 {pages} Pages Loaded")
+    if len(st.session_state.messages) == 0:
 
-        with st.spinner("🤖 Generating Summary..."):
+    st.markdown("""
 
-            prompt = f"""
-You are an AI Study Assistant.
+<div class="card">
 
-Summarize this PDF in an easy-to-understand format.
+<h2>👋 Welcome to AI Chat</h2>
 
-Include:
+<p>
 
-1. Overview
-2. Key Concepts
-3. Important Points
-4. Exam Revision Notes
+Ask anything about your uploaded PDF.
 
-PDF:
+Examples:
 
-{pdf_text}
-"""
+• Summarize Chapter 2
 
-            summary = ask_ai(prompt)
+• Explain DBMS
 
-            st.markdown(summary)
+• What are the advantages?
 
-            create_pdf(summary, "AI_Summary.pdf")
+• Generate viva questions
 
-            with open("AI_Summary.pdf", "rb") as pdf_file:
-
-                st.download_button(
-                    "📥 Download Summary",
-                    pdf_file,
-                    file_name="AI_Summary.pdf",
-                    mime="application/pdf"
-                )
-# =====================================
-# AI NOTES
-# =====================================
-
-elif feature == "📝 AI Notes":
-
-    st.header("📝 AI Study Notes")
-
-    if st.button("Generate Notes"):
-
-        with st.spinner("🤖 Creating Notes..."):
-
-            prompt = f"""
-Create well-structured study notes from this PDF.
-
-Format:
-
-# Chapter-wise Notes
-
-• Important Definitions
-
-• Key Concepts
-
-• Important Formulae
-
-• Exam Tips
-
-PDF:
-
-{pdf_text}
-"""
-
-            notes = ask_ai(prompt)
-
-            st.markdown(notes)
-
-            create_pdf(notes, "AI_Notes.pdf")
-
-            with open("AI_Notes.pdf", "rb") as pdf_file:
-
-                st.download_button(
-                    "📥 Download Notes",
-                    pdf_file,
-                    file_name="AI_Notes.pdf",
-                    mime="application/pdf"
-                )
-# =====================================
-# IMPORTANT QUESTIONS
-# =====================================
-
-elif feature == "📚 Important Questions":
-
-    st.header("📚 Important Exam Questions")
-
-    if st.button("Generate Questions"):
-
-        with st.spinner("🤖 Generating Questions..."):
-
-            prompt = f"""
-You are an AI Study Assistant.
-
-Using ONLY the uploaded PDF, generate:
-
-1. Five 2-Mark Questions
-2. Five 5-Mark Questions
-3. Five 10-Mark Questions
-4. Five Viva Questions
-
-PDF:
-
-{pdf_text}
-"""
-
-            questions = ask_ai(prompt)
-
-            st.markdown(questions)
-
-            create_pdf(questions, "Important_Questions.pdf")
-
-            with open("Important_Questions.pdf", "rb") as pdf_file:
-
-                st.download_button(
-                    "📥 Download Questions PDF",
-                    pdf_file,
-                    file_name="Important_Questions.pdf",
-                    mime="application/pdf"
-                )
-# =====================================
-# GENERATE MCQs
-# =====================================
-
-elif feature == "❓ Generate MCQs":
-
-    st.header("❓ AI MCQ Generator")
-
-    if st.button("Generate MCQs"):
-
-        with st.spinner("🤖 Creating MCQs..."):
-
-            prompt = f"""
-Generate 15 multiple-choice questions from this PDF.
-
-Each question should have:
-
-A)
-B)
-C)
-D)
-
-Then provide the correct answer.
-
-PDF:
-
-{pdf_text}
-"""
-
-            mcqs = ask_ai(prompt)
-
-            st.markdown(mcqs)
-
-            create_pdf(mcqs, "MCQs.pdf")
-
-            with open("MCQs.pdf", "rb") as pdf_file:
-
-                st.download_button(
-                    "📥 Download MCQs",
-                    pdf_file,
-                    file_name="MCQs.pdf",
-                    mime="application/pdf"
-                )
-# =====================================
-# FLASHCARDS
-# =====================================
-
-elif feature == "🃏 Flashcards":
-
-    st.header("🃏 AI Flashcards")
-
-    if st.button("Generate Flashcards"):
-
-        with st.spinner("🤖 Creating Flashcards..."):
-
-            prompt = f"""
-Create 20 flashcards from this PDF.
-
-Format:
-
-Q:
-A:
-
-Use only information from the uploaded PDF.
-
-PDF:
-
-{pdf_text}
-"""
-
-            flashcards = ask_ai(prompt)
-
-            st.markdown(flashcards)
-
-            create_pdf(flashcards, "Flashcards.pdf")
-
-            with open("Flashcards.pdf", "rb") as pdf_file:
-
-                st.download_button(
-                    "📥 Download Flashcards",
-                    pdf_file,
-                    file_name="Flashcards.pdf",
-                    mime="application/pdf"
-                )
-# =====================================
-# QUIZ MODE
-# =====================================
-
-elif feature == "🎯 Quiz Mode":
-
-    st.header("🎯 AI Quiz")
-
-    if st.button("Generate Quiz"):
-
-        with st.spinner("🤖 Creating Quiz..."):
-
-            prompt = f"""
-Create a quiz using ONLY the uploaded PDF.
-
-Requirements:
-- 10 Multiple Choice Questions
-- Four options (A, B, C, D)
-- Show the correct answer after each question.
-
-PDF:
-
-{pdf_text}
-"""
-
-            quiz = ask_ai(prompt)
-
-            st.markdown(quiz)
-
-            create_pdf(quiz, "Quiz.pdf")
-
-            with open("Quiz.pdf", "rb") as pdf_file:
-
-                st.download_button(
-                    "📥 Download Quiz PDF",
-                    pdf_file,
-                    file_name="Quiz.pdf",
-                    mime="application/pdf"
-                )
-# =====================================
-# KEYWORDS
-# =====================================
-
-elif feature == "🔑 Keywords":
-
-    st.header("🔑 Important Keywords")
-
-    if st.button("Extract Keywords"):
-
-        with st.spinner("🤖 Extracting Keywords..."):
-
-            prompt = f"""
-Extract the 30 most important keywords from this PDF.
-
-For each keyword give a one-line explanation.
-
-PDF:
-
-{pdf_text}
-"""
-
-            keywords = ask_ai(prompt)
-
-            st.markdown(keywords)
-
-            create_pdf(keywords, "Keywords.pdf")
-
-            with open("Keywords.pdf", "rb") as pdf_file:
-
-                st.download_button(
-                    "📥 Download Keywords",
-                    pdf_file,
-                    file_name="Keywords.pdf",
-                    mime="application/pdf"
-                )
-# =====================================
-# EXPLAIN TOPIC
-# =====================================
-
-elif feature == "🧠 Explain Topic":
-
-    st.header("🧠 Explain Topic")
-
-    topic = st.text_input("Enter a topic")
-
-    if st.button("Explain"):
-
-        if topic:
-
-            with st.spinner("🤖 Explaining..."):
-
-                prompt = f"""
-Using ONLY the uploaded PDF,
-
-Explain:
-
-{topic}
-
-Include:
-
-• Definition
-
-• Working
-
-• Advantages
-
-• Disadvantages
-
-• Applications
-
-PDF:
-
-{pdf_text}
-"""
-
-                explanation = ask_ai(prompt)
-
-                st.markdown(explanation)
-
-                create_pdf(explanation, "Topic_Explanation.pdf")
-
-                with open("Topic_Explanation.pdf", "rb") as pdf_file:
-
-                    st.download_button(
-                        "📥 Download Explanation",
-                        pdf_file,
-                        file_name="Topic_Explanation.pdf",
-                        mime="application/pdf"
-                    )
-# =====================================
-# TRANSLATE NOTES
-# =====================================
-
-elif feature == "🌐 Translate Notes":
-
-    st.header("🌐 Translate Notes")
-
-    language = st.selectbox(
-        "Choose Language",
-        [
-            "Hindi",
-            "Kannada",
-            "Telugu",
-            "Tamil",
-            "Malayalam"
-        ]
-    )
-
-    if st.button("Translate"):
-
-        with st.spinner("🤖 Translating..."):
-
-            prompt = f"""
-Translate the important content of this PDF into {language}.
-
-Keep headings and bullet points.
-
-PDF:
-
-{pdf_text}
-"""
-
-            translated = ask_ai(prompt)
-
-            st.markdown(translated)
-
-            create_pdf(translated, "Translated_Notes.pdf")
-
-            with open("Translated_Notes.pdf", "rb") as pdf_file:
-
-                st.download_button(
-                    "📥 Download Translation",
-                    pdf_file,
-                    file_name="Translated_Notes.pdf",
-                    mime="application/pdf"
-                )
-# =====================================
-# INTERVIEW QUESTIONS
-# =====================================
-
-elif feature == "💼 Interview Questions":
-
-    st.header("💼 AI Interview Questions")
-
-    if st.button("Generate Interview Questions"):
-
-        with st.spinner("🤖 Generating Interview Questions..."):
-
-            prompt = f"""
-Using ONLY the uploaded PDF,
-
-Generate:
-
-• Technical Interview Questions
-
-• HR Questions (if applicable)
-
-• Short Answers
-
-PDF:
-
-{pdf_text}
-"""
-
-            interview = ask_ai(prompt)
-
-            st.markdown(interview)
-
-            create_pdf(interview, "Interview_Questions.pdf")
-
-            with open("Interview_Questions.pdf", "rb") as pdf_file:
-
-                st.download_button(
-                    "📥 Download Interview Questions",
-                    pdf_file,
-                    file_name="Interview_Questions.pdf",
-                    mime="application/pdf"
-                )
-# =====================================
-# INTERVIEW QUESTIONS
-# =====================================
-
-elif feature == "💼 Interview Questions":
-
-    st.header("💼 AI Interview Questions")
-
-    if st.button("Generate Interview Questions"):
-
-        with st.spinner("🤖 Generating Interview Questions..."):
-
-            prompt = f"""
-Using ONLY the uploaded PDF,
-
-Generate:
-
-• Technical Interview Questions
-
-• HR Questions (if applicable)
-
-• Short Answers
-
-PDF:
-
-{pdf_text}
-"""
-
-            interview = ask_ai(prompt)
-
-            st.markdown(interview)
-
-            create_pdf(interview, "Interview_Questions.pdf")
-
-            with open("Interview_Questions.pdf", "rb") as pdf_file:
-
-                st.download_button(
-                    "📥 Download Interview Questions",
-                    pdf_file,
-                    file_name="Interview_Questions.pdf",
-                    mime="application/pdf"
-                )
-# =====================================
-# MIND MAP
-# =====================================
-
-elif feature == "🧠 Mind Map":
-
-    st.header("🧠 AI Mind Map")
-
-    if st.button("Generate Mind Map"):
-
-        with st.spinner("🤖 Creating Mind Map..."):
-
-            prompt = f"""
-Create a hierarchical text mind map using ONLY the uploaded PDF.
-
-PDF:
-
-{pdf_text}
-"""
-
-            mindmap = ask_ai(prompt)
-
-            st.code(mindmap)
-
-            create_pdf(mindmap,"Mind_Map.pdf")
-
-            with open("Mind_Map.pdf","rb") as pdf_file:
-
-                st.download_button(
-                    "📥 Download Mind Map",
-                    pdf_file,
-                    file_name="Mind_Map.pdf",
-                    mime="application/pdf"
-                )
-# =====================================
-# PROGRESS TRACKER
-# =====================================
-
-elif feature == "📈 Progress Tracker":
-
-    st.header("📈 Progress Tracker")
-
-    progress = st.slider("Study Progress",0,100,0)
-
-    st.progress(progress)
-
-    if progress == 100:
-        st.success("🎉 Congratulations! Course Completed!")
-
-    elif progress >= 75:
-        st.info("🔥 Almost Finished!")
-
-    elif progress >= 50:
-        st.warning("📚 Keep Going!")
-
-    else:
-        st.error("💪 Let's Start Studying!")
-
-# =====================================
-# BOOKMARKS
-# =====================================
-
-elif feature == "⭐ Bookmarks":
-
-    st.header("⭐ Bookmarks")
-
-    topic = st.text_input("Enter Bookmark")
-
-    if "bookmarks" not in st.session_state:
-        st.session_state.bookmarks=[]
-
-    if st.button("Add Bookmark"):
-
-        if topic:
-
-            st.session_state.bookmarks.append(topic)
-
-            st.success("Bookmark Added")
-
-    if st.session_state.bookmarks:
-
-        st.write("### Saved Bookmarks")
-
-        for i,item in enumerate(st.session_state.bookmarks,1):
-
-            st.write(f"{i}. {item}")
-
-# =====================================
-# CHEAT SHEET
-# =====================================
-
-elif feature == "📋 Cheat Sheet":
-
-    st.header("📋 AI Cheat Sheet")
-
-    if st.button("Generate Cheat Sheet"):
-
-        with st.spinner("🤖 Creating Cheat Sheet..."):
-
-            prompt=f"""
-Create a one-page revision cheat sheet.
-
-Include:
-
-• Key Definitions
-
-• Important Formulae
-
-• Exam Tips
-
-PDF:
-
-{pdf_text}
-"""
-
-            cheat=ask_ai(prompt)
-
-            st.markdown(cheat)
-
-            create_pdf(cheat,"Cheat_Sheet.pdf")
-
-            with open("Cheat_Sheet.pdf","rb") as pdf:
-
-                st.download_button(
-                    "📥 Download Cheat Sheet",
-                    pdf,
-                    file_name="Cheat_Sheet.pdf",
-                    mime="application/pdf"
-                )
-# =====================================
-# FORMULA EXTRACTOR
-# =====================================
-
-elif feature == "🧮 Formula Extractor":
-
-    st.header("🧮 Formula Extractor")
-
-    if st.button("Extract Formulae"):
-
-        with st.spinner("🤖 Extracting..."):
-
-            prompt=f"""
-Extract all important formulas, equations, syntax and algorithms from this PDF.
-
-PDF:
-
-{pdf_text}
-"""
-
-            formulas=ask_ai(prompt)
-
-            st.markdown(formulas)
-
-            create_pdf(formulas,"Formula_Extractor.pdf")
-
-            with open("Formula_Extractor.pdf","rb") as pdf:
-
-                st.download_button(
-                    "📥 Download Formula PDF",
-                    pdf,
-                    file_name="Formula_Extractor.pdf",
-                    mime="application/pdf"
-                )
-st.markdown("---")
-
-st.markdown("""
-<div style='text-align:center;color:gray;padding:15px;'>
-
-<h4>📚 AI Study Assistant Pro</h4>
-
-Built with ❤️ using Python • Streamlit • Gemini AI
-
-Version 3.0
+</p>
 
 </div>
+
 """, unsafe_allow_html=True)
