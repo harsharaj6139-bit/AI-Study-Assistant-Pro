@@ -143,7 +143,27 @@ def read_pdf(files):
 st.markdown("""
 
 <style>
+.hero-animation{
 
+animation:float 3s ease-in-out infinite;
+
+}
+
+@keyframes float{
+
+0%{
+transform:translateY(0px);
+}
+
+50%{
+transform:translateY(-8px);
+}
+
+100%{
+transform:translateY(0px);
+}
+
+}
 /* Google Font */
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
@@ -168,25 +188,6 @@ linear-gradient(
 
 }
 
-/* Hide Streamlit */
-
-header{
-
-visibility:hidden;
-
-}
-
-footer{
-
-visibility:hidden;
-
-}
-
-#MainMenu{
-
-visibility:hidden;
-
-}
 
 /* Layout */
 
@@ -279,20 +280,8 @@ margin-bottom:25px;
 /* Glass Card */
 
 .card{
-div[data-testid="column"]>div{
 
-transition:.3s;
-
-}
-
-div[data-testid="column"]>div:hover{
-
-transform:translateY(-6px);
-
-}
-background:
-
-rgba(255,255,255,.07);
+background:rgba(255,255,255,.07);
 
 backdrop-filter:blur(18px);
 
@@ -303,6 +292,18 @@ border-radius:22px;
 border:1px solid rgba(255,255,255,.08);
 
 margin-bottom:25px;
+
+}
+
+div[data-testid="column"] > div{
+
+transition:.3s;
+
+}
+
+div[data-testid="column"] > div:hover{
+
+transform:translateY(-6px);
 
 }
 
@@ -351,37 +352,6 @@ border:2px dashed #4F46E5;
 </style>
 
 """,unsafe_allow_html=True)
-# ============================================================
-# HERO SECTION
-# ============================================================
-
-st.markdown(f"""
-
-<div class="hero">
-
-<h1>📚 AI Study Assistant Pro</h1>
-
-<h3>Learn Faster • Study Smarter</h3>
-
-<p>
-
-🤖 Powered by Gemini AI
-
-</p>
-
-<p>
-
-📅 {today}
-
-</p>
-
-</div>
-
-""", unsafe_allow_html=True)
-# ============================================================
-# PROFESSIONAL SIDEBAR
-# ============================================================
-
 st.sidebar.markdown("""
 <h1 style='text-align:center;color:white;'>
 📚 AI Study Assistant
@@ -392,7 +362,6 @@ Your Personal AI Tutor
 </p>
 
 <hr>
-
 """, unsafe_allow_html=True)
 
 st.sidebar.markdown("### 📚 AI Tools")
@@ -446,12 +415,6 @@ st.sidebar.markdown("---")
 st.sidebar.success("🚀 Version 5.0")
 
 st.sidebar.info("🤖 Gemini Connected")
-
-if st.sidebar.button("🗑 Clear Chat"):
-
-    st.session_state.messages=[]
-
-    st.rerun()
 # ============================================================
 # CLEAR CHAT
 # ============================================================
@@ -511,14 +474,7 @@ words = len(pdf_text.split())
 characters = len(pdf_text)
 
 reading_time = max(1, words // 200)
-# ============================================================
-# DASHBOARD
-# ============================================================
-# ============================================================
-# PREMIUM DASHBOARD
-# ============================================================
-
-# ============================================================
+#=================================================
 # PREMIUM DASHBOARD
 # ============================================================
 
