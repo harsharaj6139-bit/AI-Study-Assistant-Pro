@@ -279,7 +279,17 @@ margin-bottom:25px;
 /* Glass Card */
 
 .card{
+div[data-testid="column"]>div{
 
+transition:.3s;
+
+}
+
+div[data-testid="column"]>div:hover{
+
+transform:translateY(-6px);
+
+}
 background:
 
 rgba(255,255,255,.07);
@@ -508,38 +518,58 @@ reading_time = max(1, words // 200)
 # PREMIUM DASHBOARD
 # ============================================================
 
+# ============================================================
+# PREMIUM DASHBOARD
+# ============================================================
+
 st.markdown("## 📊 AI Dashboard")
 
-card1, card2, card3, card4 = st.columns(4)
+cards = st.columns(4)
 
-cards = [
-    ("📄", "Pages", pages, "#2563EB"),
-    ("📝", "Words", f"{words:,}", "#8B5CF6"),
-    ("🔤", "Characters", f"{characters:,}", "#10B981"),
-    ("⏱", "Reading Time", f"{reading_time} min", "#F59E0B")
+data = [
+
+("📄","Pages",pages,"#2563EB"),
+
+("📝","Words",f"{words:,}","#7C3AED"),
+
+("🔤","Characters",f"{characters:,}","#10B981"),
+
+("⏱","Reading",f"{reading_time} min","#F59E0B")
+
 ]
 
-for col, (icon, title, value, color) in zip(
-    [card1, card2, card3, card4], cards
-):
+for col,(icon,title,value,color) in zip(cards,data):
 
     with col:
 
         st.markdown(f"""
-        <div style="
-        background:linear-gradient(135deg,{color},#111827);
-        padding:25px;
-        border-radius:22px;
-        color:white;
-        text-align:center;
-        box-shadow:0 10px 30px rgba(0,0,0,.35);
-        ">
-            <div style="font-size:42px;">{icon}</div>
-            <h4>{title}</h4>
-            <h2>{value}</h2>
-        </div>
-        """, unsafe_allow_html=True)
-        # ============================================================
+
+<div style="
+background:linear-gradient(135deg,{color},#111827);
+padding:28px;
+border-radius:20px;
+text-align:center;
+color:white;
+box-shadow:0 12px 25px rgba(0,0,0,.35);
+">
+
+<div style="font-size:46px;">
+{icon}
+</div>
+
+<h3 style="margin:10px 0;">
+{value}
+</h3>
+
+<p style="color:#E5E7EB;">
+{title}
+</p>
+
+</div>
+
+""",unsafe_allow_html=True)
+
+# ============================================================
 # AI STATUS
 # ============================================================
 
