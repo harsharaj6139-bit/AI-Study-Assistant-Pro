@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from pyparsing import WordStart
 import streamlit as st
 from pypdf import PdfReader
 from google import genai
@@ -394,6 +395,15 @@ st.progress(100)
 st.markdown("""
 <h2 style='color:white;'>📊 Dashboard</h2>
 """, unsafe_allow_html=True)
+
+col1, col2 = st.columns(2)
+
+with col1:
+
+    # Calculate statistics
+pages = sum(len(PdfReader(f).pages) for f in uploaded_files)
+words = len(pdf_text.split())
+characters = len(pdf_text)
 
 col1, col2 = st.columns(2)
 
