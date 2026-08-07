@@ -352,16 +352,6 @@ Upload one or more study PDFs and unlock powerful AI tools.
 
 <ul>
 
-<li>💬 Chat with PDF</li>
-
-<li>📝 Generate Notes</li>
-
-<li>📚 Important Questions</li>
-
-<li>🧠 Mind Maps</li>
-
-<li>🎯 Quiz Mode</li>
-
 </ul>
 
 </div>
