@@ -205,14 +205,12 @@ padding-right:35px;
 section[data-testid="stSidebar"]{
 
 background:
-
 linear-gradient(
-
 180deg,
-
 #0F172A,
-
 #111827);
+
+padding:15px;
 
 border-right:1px solid rgba(255,255,255,.08);
 
@@ -221,6 +219,28 @@ border-right:1px solid rgba(255,255,255,.08);
 section[data-testid="stSidebar"] *{
 
 color:white;
+
+}
+
+div[role="radiogroup"] > label{
+
+background:#1E293B;
+
+padding:14px;
+
+border-radius:12px;
+
+margin-bottom:8px;
+
+transition:.3s;
+
+}
+
+div[role="radiogroup"] > label:hover{
+
+background:#2563EB;
+
+transform:translateX(6px);
 
 }
 
@@ -349,22 +369,29 @@ st.markdown(f"""
 
 """, unsafe_allow_html=True)
 # ============================================================
-# SIDEBAR
+# PROFESSIONAL SIDEBAR
 # ============================================================
 
-st.sidebar.title("🤖 AI Study Assistant")
+st.sidebar.markdown("""
+<h1 style='text-align:center;color:white;'>
+📚 AI Study Assistant
+</h1>
 
-st.sidebar.markdown(
-"### Your Personal AI Tutor"
-)
+<p style='text-align:center;color:#94A3B8;'>
+Your Personal AI Tutor
+</p>
 
-st.sidebar.markdown("---")
+<hr>
 
-feature = st.sidebar.selectbox(
+""", unsafe_allow_html=True)
 
-"Choose Feature",
+st.sidebar.markdown("### 📚 AI Tools")
 
-(
+feature = st.sidebar.radio(
+
+"",
+
+[
 
 "💬 Chat with PDF",
 
@@ -400,7 +427,7 @@ feature = st.sidebar.selectbox(
 
 "🧮 Formula Extractor"
 
-)
+]
 
 )
 
@@ -408,9 +435,13 @@ st.sidebar.markdown("---")
 
 st.sidebar.success("🚀 Version 5.0")
 
-st.sidebar.info(
-"Gemini AI Connected"
-)
+st.sidebar.info("🤖 Gemini Connected")
+
+if st.sidebar.button("🗑 Clear Chat"):
+
+    st.session_state.messages=[]
+
+    st.rerun()
 # ============================================================
 # CLEAR CHAT
 # ============================================================
