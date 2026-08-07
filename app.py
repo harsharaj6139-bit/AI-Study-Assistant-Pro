@@ -117,9 +117,31 @@ section[data-testid="stSidebar"]{
 section[data-testid="stSidebar"] *{
     color:white;
 }
+}
 
 /* Hero */
+/* Sidebar Menu */
 
+div[role="radiogroup"] > label{
+    background:#1E293B;
+    padding:14px 16px;
+    border-radius:14px;
+    margin-bottom:10px;
+    border:1px solid rgba(255,255,255,.06);
+    transition:0.3s;
+}
+
+div[role="radiogroup"] > label:hover{
+    background:#4F46E5;
+    transform:translateX(8px);
+    box-shadow:0 8px 20px rgba(79,70,229,.35);
+}
+
+div[role="radiogroup"] p{
+    color:white;
+    font-size:16px;
+    font-weight:600;
+}
 .hero{
 
 background:linear-gradient(
