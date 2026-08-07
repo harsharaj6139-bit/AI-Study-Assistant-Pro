@@ -396,19 +396,20 @@ st.markdown("""
 <h2 style='color:white;'>📊 Dashboard</h2>
 """, unsafe_allow_html=True)
 
-col1, col2 = st.columns(2)
+# Dashboard
+st.markdown("""
+<h2 style='color:white;'>📊 Dashboard</h2>
+""", unsafe_allow_html=True)
 
-with col1:
-
-    # Calculate statistics
+# Calculate statistics
 pages = sum(len(PdfReader(f).pages) for f in uploaded_files)
 words = len(pdf_text.split())
 characters = len(pdf_text)
+reading_time = max(1, words // 200)
 
 col1, col2 = st.columns(2)
 
 with col1:
-
     st.markdown(f"""
     <div style="
     background:linear-gradient(135deg,#2563EB,#4F46E5);
@@ -416,19 +417,13 @@ with col1:
     border-radius:20px;
     color:white;
     ">
-    <h3>📄 Study Material</h3>
-
-    <h1>{pages} Pages</h1>
-
-    <p>{len(uploaded_files)} PDF(s) Uploaded</p>
-
+        <h3>📄 Study Material</h3>
+        <h1>{pages} Pages</h1>
+        <p>{len(uploaded_files)} PDF(s) Uploaded</p>
     </div>
     """, unsafe_allow_html=True)
 
 with col2:
-
-    reading_time = max(1, words // 200)
-
     st.markdown(f"""
     <div style="
     background:linear-gradient(135deg,#10B981,#14B8A6);
@@ -436,12 +431,9 @@ with col2:
     border-radius:20px;
     color:white;
     ">
-    <h3>🧠 AI Analytics</h3>
-
-    <h1>{reading_time} min</h1>
-
-    <p>Estimated Reading Time</p>
-
+        <h3>🧠 AI Analytics</h3>
+        <h1>{reading_time} min</h1>
+        <p>Estimated Reading Time</p>
     </div>
     """, unsafe_allow_html=True)
     st.markdown("## 🚀 Features")
